@@ -1,5 +1,4 @@
-import { screenShot } from './lib/screen-shot.js';
-
+import { screenShot } from "./lib/screen-shot.js";
 
 export class GeocamViewerScreenShot extends HTMLElement {
   constructor() {
@@ -15,12 +14,10 @@ export class GeocamViewerScreenShot extends HTMLElement {
     const parent = this.parentNode;
     if (parent.viewer && parent.viewer.plugin) {
       // Call a method on the parent
-        this.plugin = new screenShot();
-  parent.viewer.plugin(this.plugin);
+      this.plugin = new screenShot();
+      parent.viewer.plugin(this.plugin);
     } else {
-      console.error(
-        "GeocamViewerScreenShot must be a child of GeocamViewer"
-      );
+      console.error("GeocamViewerScreenShot must be a child of GeocamViewer");
     }
   }
 

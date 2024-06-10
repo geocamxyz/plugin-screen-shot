@@ -17,7 +17,7 @@ const injectStyle = (id, rules) => {
 };
 
 export const screenShot = function (config = {}) {
-  let viewer, shotBtn, viewShotBtn, arcgisView;
+  let viewer, shotBtn, viewShotBtn, arcgisView, channel;
 
   const STYLES = `
   .geocam-screenshot-button {
@@ -30,12 +30,16 @@ export const screenShot = function (config = {}) {
 
   injectStyle("geocam-screenshot-button", STYLES);
 
-  const flash = (el) => {
-    if (el) {
-      el.style.filter = "invert(1)";
-      setTimeout(() => {
-        el.style.removeProperty("filter");
-      }, 100);
+  const sendMessage = (blob) => {
+    if (channel) {
+      const data = {
+        action: "screenshot",
+        payload: {
+          img: blob,
+          url: document.location.href,
+        },
+      };
+      channel.postMessage(blob);
     }
   };
 
@@ -110,6 +114,7 @@ export const screenShot = function (config = {}) {
     const data = [new ClipboardItem({ [blob.type]: blob })];
     // Write the data to the clipboard
     await navigator.clipboard.write(data);
+    sendMessage(blob);
     document.body.style.removeProperty("filter");
   };
 
@@ -121,6 +126,10 @@ export const screenShot = function (config = {}) {
     });
     viewer.addControl(shotBtn, "left-top");
     shotBtn.addEventListener("click", copyPanoToClipboard, false);
+    const channelName = this.getAttribute("channel");
+    if (channelName && BroadcastChannel in window) {
+      channel = new BroadcastChannel(channelName);
+    }
   };
 
   this.arcgisView = function (view) {

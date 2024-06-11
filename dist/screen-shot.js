@@ -13,13 +13,13 @@ const I = (g, t = {}, r = "") => {
        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTQgNWgzbDItMmg2bDIgMmgzYTIgMiAwIDAgMSAyIDJ2MTJhMiAyIDAgMCAxLTIgMkg0YTIgMiAwIDAgMS0yLTJWN2EyIDIgMCAwIDEgMi0ybTkuMDkgNC40NWwtMi4wNCAyLjczbDEuNTUgMi4wN2wtLjg3LjY2bC0yLjQ2LTMuMjdMNiAxNmgxMnoiLz48L3N2Zz4=');
     }
   `);
-  const p = (a) => {
+  const b = (a) => {
     w && (document.location.href, w.postMessage(a));
-  }, b = async (a) => {
+  }, p = async (a) => {
     const i = t.renderer.domElement;
     i.style.filter = "invert(1)";
     const o = await new Promise((e) => i.toBlob(e)), n = [new ClipboardItem({ [o.type]: o })];
-    await navigator.clipboard.write(n), i.style.removeProperty("filter");
+    await navigator.clipboard.write(n), b(o), i.style.removeProperty("filter");
   }, u = async (a) => {
     document.body.style.filter = "invert(1)";
     const i = t.renderer.domElement, o = i.getBoundingClientRect(), n = s.container.getBoundingClientRect(), e = {
@@ -52,15 +52,15 @@ const I = (g, t = {}, r = "") => {
       o.top - e.top
     ));
     const h = await new Promise((M) => l.toBlob(M)), D = [new ClipboardItem({ [h.type]: h })];
-    await navigator.clipboard.write(D), p(h), document.body.style.removeProperty("filter");
+    await navigator.clipboard.write(D), b(h), document.body.style.removeProperty("filter");
   };
   this.init = function(a) {
     t = a, r = I("DIV", {
       class: "geocam-screenshot-button geocam-viewer-control-button",
       title: "Copy a screenshot of the current viewer image to the clipboard"
-    }), t.addControl(r, "left-top"), r.addEventListener("click", b, !1);
-    const i = this.getAttribute("channel");
-    i && BroadcastChannel in window && (w = new BroadcastChannel(i));
+    }), t.addControl(r, "left-top"), r.addEventListener("click", p, !1);
+    const i = g.channel;
+    i && "BroadcastChannel" in window && (w = new BroadcastChannel(i), console.log("broadcasting on channel", i));
   }, this.arcgisView = function(a) {
     console.log("screen shot add view", a), s || (s = a, c = I("DIV", {
       class: "geocam-viewshot-button geocam-viewer-control-button",
@@ -77,7 +77,7 @@ class v extends HTMLElement {
   connectedCallback() {
     console.log("screen-shot connected");
     const t = this.parentNode;
-    t.viewer && t.viewer.plugin ? (this.plugin = new f(), t.viewer.plugin(this.plugin)) : console.error("GeocamViewerScreenShot must be a child of GeocamViewer");
+    t.viewer && t.viewer.plugin ? (this.plugin = new f({ channel: this.getAttribute("channel") }), t.viewer.plugin(this.plugin)) : console.error("GeocamViewerScreenShot must be a child of GeocamViewer");
   }
   disconnectedCallback() {
     this.plugin = null, console.log("screen-shot disconnected");

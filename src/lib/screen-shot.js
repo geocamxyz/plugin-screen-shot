@@ -39,7 +39,7 @@ export const screenShot = function (config = {}) {
           url: document.location.href,
         },
       };
-      channel.postMessage(blob);
+      channel.postMessage(data);
     }
   };
 

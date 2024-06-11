@@ -51,6 +51,7 @@ export const screenShot = function (config = {}) {
     const data = [new ClipboardItem({ [blob.type]: blob })];
     // Write the data to the clipboard
     await navigator.clipboard.write(data);
+    sendMessage(blob);
     canvas.style.removeProperty("filter");
   };
 
@@ -126,9 +127,10 @@ export const screenShot = function (config = {}) {
     });
     viewer.addControl(shotBtn, "left-top");
     shotBtn.addEventListener("click", copyPanoToClipboard, false);
-    const channelName = this.getAttribute("channel");
-    if (channelName && BroadcastChannel in window) {
+    const channelName = config.channel;
+     if (channelName && ('BroadcastChannel' in window)) {
       channel = new BroadcastChannel(channelName);
+      console.log("broadcasting on channel", channelName);
     }
   };
 

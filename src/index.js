@@ -14,7 +14,7 @@ export class GeocamViewerScreenShot extends HTMLElement {
     const parent = this.parentNode;
     if (parent.viewer && parent.viewer.plugin) {
       // Call a method on the parent
-      this.plugin = new screenShot();
+      this.plugin = new screenShot({channel: this.getAttribute("channel")});
       parent.viewer.plugin(this.plugin);
     } else {
       console.error("GeocamViewerScreenShot must be a child of GeocamViewer");

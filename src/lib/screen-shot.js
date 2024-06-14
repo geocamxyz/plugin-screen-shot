@@ -17,7 +17,7 @@ const injectStyle = (id, rules) => {
 };
 
 export const screenShot = function (config = {}) {
-  let viewer, shotBtn, viewShotBtn, arcgisView, channel;
+  let viewer, shotBtn, viewShotBtn, arcgisView, channel, maxWidth;
 
   const STYLES = `
   .geocam-screenshot-button {
@@ -43,10 +43,28 @@ export const screenShot = function (config = {}) {
     }
   };
 
+  const resizeBlob = function(blob, width, compression) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = Math.min(width, img.width);
+        canvas.height = width * img.height / img.width;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(resolve, blob.type, compression);
+      };
+      img.src = URL.createObjectURL(blob);
+    });
+  }
+
   const copyPanoToClipboard = async (e) => {
     const canvas = viewer.renderer.domElement;
     canvas.style.filter = "invert(1)";
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+    let blob = await new Promise((resolve) => canvas.toBlob(resolve));
+    if (maxWidth) {
+      blob = await resizeBlob(blob, maxWidth, 0.9);
+    }
     // Create ClipboardItem with blob and it's type, and add to an array
     const data = [new ClipboardItem({ [blob.type]: blob })];
     // Write the data to the clipboard
@@ -110,7 +128,10 @@ export const screenShot = function (config = {}) {
         viewerRect.top - bounds.top
       );
     }
-    const blob = await new Promise((resolve) => combinedCanvas.toBlob(resolve));
+    let blob = await new Promise((resolve) => combinedCanvas.toBlob(resolve));
+        if (maxWidth) {
+      blob = await resizeBlob(blob, maxWidth, 0.9);
+    }
     // Create ClipboardItem with blob and it's type, and add to an array
     const data = [new ClipboardItem({ [blob.type]: blob })];
     // Write the data to the clipboard
@@ -132,6 +153,7 @@ export const screenShot = function (config = {}) {
       channel = new BroadcastChannel(channelName);
       console.log("broadcasting on channel", channelName);
     }
+    maxWidth = parseInt(config.maxWidth);
   };
 
   this.arcgisView = function (view) {
